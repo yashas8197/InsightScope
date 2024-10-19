@@ -30,7 +30,7 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://moonshot-datavisulalization-server-1.onrender.com/data"
+          "https://insight-scope-zkm6.vercel.app/api/data"
         );
         const json = await response.json();
         setDateFromBe(json);
@@ -78,7 +78,7 @@ const Home = () => {
     handleFilter();
   }, [JSON.stringify(dateRange), ageParams, genderParams, dataFromBe]);
 
-  console.log(filteredData);
+  // console.log(filteredData);
 
   return (
     <>

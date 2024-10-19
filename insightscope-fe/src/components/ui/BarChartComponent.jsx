@@ -28,7 +28,7 @@ const chartConfig = {
 
 export function BarChartComponent(result) {
   const data = aggregateFeatureDataBar(result);
-  // console.log(data);
+  console.log(data);
 
   const handleClick = (data) => {
     result.setCategory(data.feature);
