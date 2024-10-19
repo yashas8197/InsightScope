@@ -1,6 +1,5 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 import {
@@ -29,6 +28,7 @@ const chartConfig = {
 
 export function BarChartComponent(result) {
   const data = aggregateFeatureDataBar(result);
+  // console.log(data);
 
   const handleClick = (data) => {
     result.setCategory(data.feature);

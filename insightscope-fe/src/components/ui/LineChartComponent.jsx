@@ -33,19 +33,26 @@ const chartConfig = {
 
 export function LineChartComponent(result) {
   const data = [...result.data];
+  console.log(data);
 
   if (!data) return;
 
   const formattedData = data.map((entry) => {
-    const [day, month, year] = entry.Day.split("/");
+    if (!entry?.day) {
+      console.warn("Invalid or missing 'day' field in entry:", entry);
+      return entry; // Return the entry as-is if 'day' is missing
+    }
+
+    const [day, month, year] = entry.day.split("/");
     const date = new Date(year, month - 1, day);
     const formattedDay = date.toLocaleDateString("en-GB", {
       day: "numeric",
       month: "short",
     });
+
     return {
       ...entry,
-      Day: formattedDay,
+      day: formattedDay,
     };
   });
 
@@ -56,8 +63,8 @@ export function LineChartComponent(result) {
       <CardHeader>
         <CardTitle>Line Chart - Linear</CardTitle>
         <CardDescription>
-          {formattedData[0]?.Day} -{" "}
-          {formattedData[formattedData.length - 1]?.Day} - Feature{" "}
+          {formattedData[0]?.day} -{" "}
+          {formattedData[formattedData.length - 1]?.day} - Feature{" "}
           {result.category}
         </CardDescription>
       </CardHeader>
@@ -73,7 +80,7 @@ export function LineChartComponent(result) {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="Day"
+              dataKey="day"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
@@ -90,7 +97,7 @@ export function LineChartComponent(result) {
               content={<ChartTooltipContent hideLabel />}
             />
             <Line
-              dataKey="F"
+              dataKey={result.category}
               type="linear"
               stroke="var(--color-desktop)"
               strokeWidth={2}
