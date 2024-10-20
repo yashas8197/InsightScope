@@ -1,46 +1,41 @@
-"use client";
-
 import {
   Card,
-  CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  LineChart,
-  CartesianGrid,
-  Line,
-  XAxis,
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
   Tooltip,
-  YAxis,
-} from "recharts";
+  Legend,
+  Filler,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import zoomPlugin from "chartjs-plugin-zoom";
 
-export const description = "A linear line chart";
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin,
+  Filler
+);
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-};
-
-export function LineChartComponent(result) {
-  const data = [...result.data];
-  console.log(data);
-
-  if (!data) return;
-
+export function LineChartComponent({ data, category }) {
   const formattedData = data.map((entry) => {
     if (!entry?.day) {
       console.warn("Invalid or missing 'day' field in entry:", entry);
-      return entry; // Return the entry as-is if 'day' is missing
+      return entry;
     }
 
     const [day, month, year] = entry.day.split("/");
@@ -56,7 +51,61 @@ export function LineChartComponent(result) {
     };
   });
 
-  const dataCopy = formattedData;
+  const labels = formattedData.map((entry) => entry.day);
+
+  const yAxisData = formattedData.map((entry) => entry[category]);
+
+  const dataForChart = {
+    labels: labels,
+    datasets: [
+      {
+        label: `Values for ${category}`,
+        data: yAxisData,
+        borderColor: "rgba(75,192,192,1)",
+        backgroundColor: "rgba(75,192,192,0.2)",
+        fill: true,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "xy",
+        },
+        zoom: {
+          wheel: {
+            enabled: true,
+            modifierKey: "ctrl",
+          },
+          pinch: {
+            enabled: true,
+          },
+          mode: "xy",
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Days",
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: `Values for ${category}`,
+        },
+      },
+    },
+  };
 
   return (
     <Card>
@@ -64,48 +113,11 @@ export function LineChartComponent(result) {
         <CardTitle>Line Chart - Linear</CardTitle>
         <CardDescription>
           {formattedData[0]?.day} -{" "}
-          {formattedData[formattedData.length - 1]?.day} - Feature{" "}
-          {result.category}
+          {formattedData[formattedData.length - 1]?.day} - Feature {category}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
-            accessibilityLayer
-            data={dataCopy}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="day"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 5)}
-            />
-            <YAxis
-              dataKey={result.category}
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Line
-              dataKey={result.category}
-              type="linear"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
+
+      <Line data={dataForChart} options={options} />
     </Card>
   );
 }

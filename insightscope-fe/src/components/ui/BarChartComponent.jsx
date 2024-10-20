@@ -1,81 +1,110 @@
-"use client";
-
-import { Bar, BarChart, XAxis, YAxis } from "recharts";
-
+import React, { useRef } from "react";
 import {
   Card,
-  CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 import { aggregateFeatureDataBar } from "@/utils/groupFeatureTimeSpent";
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
 
-export const description = "A horizontal bar chart";
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  zoomPlugin
+);
 
-const chartConfig = {
-  timeSpent: {
-    label: "timeSpent",
-    color: "hsl(var(--chart-1))",
-  },
-};
+export function BarChartComponent({ data, setCategory, setSearchParams }) {
+  const chartData = aggregateFeatureDataBar(data);
 
-export function BarChartComponent(result) {
-  const data = aggregateFeatureDataBar(result);
-  console.log(data);
+  if (!Array.isArray(chartData) || chartData.length === 0) {
+    return <p>No data available for the chart.</p>;
+  }
 
-  const handleClick = (data) => {
-    result.setCategory(data.feature);
+  const labels = chartData.map((item) => item.feature);
+  const timeSpentData = chartData.map((item) => item.timeSpent);
+
+  const dataForChart = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Values (Estimated in Minutes)",
+        data: timeSpentData,
+        backgroundColor: "rgba(137, 134, 216, 0.6)",
+        borderColor: "rgba(137, 134, 216, 1)",
+        borderWidth: 1,
+      },
+    ],
   };
 
-  if (!data) return;
+  const handleClick = (event, elements) => {
+    if (elements.length > 0) {
+      const clickedElementIndex = elements[0].index;
+      const clickedLabel = labels[clickedElementIndex];
+      setCategory(clickedLabel);
+      setSearchParams((prev) => {
+        prev.set("cat", clickedLabel);
+        return prev;
+      });
+    }
+  };
+
+  const options = {
+    responsive: true,
+    indexAxis: "y",
+    onClick: (event, elements) => handleClick(event, elements),
+    plugins: {
+      legend: {
+        position: "top",
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "xy",
+        },
+        zoom: {
+          enabled: true,
+          mode: "xy",
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Total Time Spent (Minutes) / Feature",
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Categories (Features)",
+        },
+      },
+    },
+  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bar Chart - Horizontal</CardTitle>
-        <CardDescription>
-          {result?.data[0]?.Day} - {result?.data[result.data.length - 1]?.Day}
-        </CardDescription>
+        <CardTitle>Bar Chart</CardTitle>
+        <CardDescription></CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart
-            accessibilityLayer
-            data={data}
-            layout="vertical"
-            margin={{
-              left: -20,
-            }}
-          >
-            <XAxis type="number" dataKey="timeSpent" />
-            <YAxis
-              dataKey="feature"
-              type="category"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar
-              onClick={(e) => handleClick(e)}
-              dataKey="timeSpent"
-              fill="var(--color-timeSpent)"
-              radius={5}
-            />
-          </BarChart>
-        </ChartContainer>
-      </CardContent>
+      <Bar data={dataForChart} options={options} />
     </Card>
   );
 }

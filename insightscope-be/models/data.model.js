@@ -13,27 +13,27 @@ const dataSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  a: {
+  A: {
     type: Number,
     require: true,
   },
-  b: {
+  B: {
     type: Number,
     require: true,
   },
-  c: {
+  C: {
     type: Number,
     require: true,
   },
-  d: {
+  D: {
     type: Number,
     require: true,
   },
-  e: {
+  E: {
     type: Number,
     require: true,
   },
-  f: {
+  F: {
     type: Number,
     require: true,
   },

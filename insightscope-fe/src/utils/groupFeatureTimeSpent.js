@@ -1,4 +1,4 @@
-export const aggregateFeatureDataBar = ({ data }) => {
+export const aggregateFeatureDataBar = (data) => {
   const aggregatedData = data?.reduce((acc, curr) => {
     acc["A"] = (acc["A"] || 0) + curr.A;
     acc["B"] = (acc["B"] || 0) + curr.B;
