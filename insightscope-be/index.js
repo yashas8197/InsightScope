@@ -3,9 +3,16 @@ require("dotenv").config();
 const Data = require("./models/data.model");
 const express = require("express");
 const cors = require("cors");
-const { default: mongoose } = require("mongoose");
+const {
+  userSignUp,
+  loginUser,
+  logoutUser,
+} = require("./controllers/user.controller");
+const cookieParser = require("cookie-parser");
+const verifyJWT = require("./middleware/auth.middleware");
 const app = express();
 
+app.use(cookieParser());
 app.use(express.json());
 
 const corsOptions = {
@@ -16,6 +23,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 initializeDatabase();
+
+app.post("/api/signup", userSignUp);
+app.post("/api/login", loginUser);
+app.post("/api/logout", verifyJWT, logoutUser);
 
 app.get("/api/data", async (req, res) => {
   try {
