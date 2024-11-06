@@ -5,11 +5,12 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,7 +20,7 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Simple validation
@@ -28,8 +29,30 @@ const LoginPage = () => {
     if (!formData.password) newErrors.password = "Password is required";
 
     if (Object.keys(newErrors).length === 0) {
-      // Proceed with the login logic
-      console.log(formData);
+      try {
+        const response = await fetch(
+          "https://insight-scope-pp2r.vercel.app/api/login",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          }
+        );
+
+        const data = await response.json();
+        console.log(data);
+
+        if (response.ok && data.accessToken) {
+          localStorage.setItem("authToken", data.accessToken);
+          localStorage.setItem("user", JSON.stringify(data.user));
+          navigate("/dashboard");
+        } else {
+          setErrors({ general: "Invalid email or password" });
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        setErrors({ general: "An error occurred during login" });
+      }
     } else {
       setErrors(newErrors);
     }

@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    fullname: "",
     email: "",
     password: "",
   });
@@ -23,18 +23,49 @@ const SignUp = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Simple validation
     const newErrors = {};
-    if (!formData.username) newErrors.username = "Username is required";
+    if (!formData.fullname) newErrors.fullname = "fullname is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
+    console.log(formData);
 
     if (Object.keys(newErrors).length === 0) {
-      // Proceed with the signup logic
-      console.log(formData);
+      try {
+        const response = await fetch(
+          "https://insight-scope-pp2r.vercel.app/api/signup",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.token) {
+          localStorage.setItem("authToken", data.token);
+
+          navigate("/dashboard");
+        } else {
+          setErrors("Signup failed. Please try again.");
+        }
+
+        setFormData({
+          fullname: "",
+          email: "",
+          password: "",
+        });
+        setErrors({});
+      } catch (error) {
+        console.error("Signup error:", error);
+        setErrors("An error occurred during signup.");
+      }
     } else {
       setErrors(newErrors);
     }
@@ -51,22 +82,22 @@ const SignUp = () => {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Username Input */}
+            {/* fullname Input */}
             <div>
-              <label htmlFor="username" className="block text-gray-600">
-                Username
+              <label htmlFor="fullname" className="block text-gray-600">
+                fullname
               </label>
               <input
                 type="text"
-                id="username"
-                name="username"
-                value={formData.username}
+                id="fullname"
+                name="fullname"
+                value={formData.fullname}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-md mt-2"
-                placeholder="Enter username"
+                placeholder="Enter fullname"
               />
-              {errors.username && (
-                <p className="text-red-500 text-sm">{errors.username}</p>
+              {errors.fullname && (
+                <p className="text-red-500 text-sm">{errors.fullname}</p>
               )}
             </div>
 

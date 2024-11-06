@@ -5,6 +5,7 @@ import App from "./App.jsx";
 import "./index.css";
 import Login from "./Pages/Login.jsx";
 import SignUp from "./Pages/Signup.jsx";
+import AuthWrapper from "./utils/AuthWrapper.jsx";
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <App />,
+    element: (
+      <AuthWrapper>
+        <App />
+      </AuthWrapper>
+    ),
   },
 ]);
 
