@@ -7,6 +7,7 @@ const {
   userSignUp,
   loginUser,
   logoutUser,
+  refreshAccessToken,
 } = require("./controllers/user.controller");
 const cookieParser = require("cookie-parser");
 const verifyJWT = require("./middleware/auth.middleware");
@@ -27,6 +28,7 @@ initializeDatabase();
 app.post("/api/signup", userSignUp);
 app.post("/api/login", loginUser);
 app.post("/api/logout", verifyJWT, logoutUser);
+app.post("/api/refresh-token", refreshAccessToken);
 
 app.get("/api/data", async (req, res) => {
   try {

@@ -1,4 +1,5 @@
 const { User } = require("../models/user.model");
+const jwt = require("jsonwebtoken");
 
 const genreateAccessOrRefreshToken = async (userId) => {
   try {
@@ -61,7 +62,6 @@ const userSignUp = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log({ email, password });
 
     if (!email && !password) {
       return res
@@ -139,4 +139,50 @@ const logoutUser = async (req, res) => {
   } catch (error) {}
 };
 
-module.exports = { userSignUp, loginUser, logoutUser };
+const refreshAccessToken = async (req, res) => {
+  try {
+    const incomingRefreshToken =
+      req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+      return res.status(401).json({ error: "Unauthorized request" });
+    }
+
+    const decodedToken = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+    const user = await User.findById(decodedToken?._id);
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid Refresh token" });
+    }
+
+    if (incomingRefreshToken !== user?.refreshToken) {
+      return res
+        .status(401)
+        .json({ error: "Refresh token is expired or used" });
+    }
+
+    const { accessToken, refreshToken } = await generateAccessOrRefreshToken(
+      user._id
+    );
+
+    const options = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json({ accessToken, refreshToken });
+  } catch (error) {
+    console.error("Error in refreshAccessToken:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = { userSignUp, loginUser, logoutUser, refreshAccessToken };
