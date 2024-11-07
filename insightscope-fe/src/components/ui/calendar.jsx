@@ -9,7 +9,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-2 sm:p-6 lg:p-11", className)} // Adjust padding for smaller screens
+      className={cn("md:p-0 sm:p-6 2xl:p-10 xl:p-10", className)} // Adjust padding for smaller screens
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
