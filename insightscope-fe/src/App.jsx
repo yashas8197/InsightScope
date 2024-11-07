@@ -35,16 +35,13 @@ const App = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const SPREADSHEET_ID = "1l7GstWHc69HPV0irSdvoMIyHgtufUPKsbtCiNw7IKR0";
-      const RANGE = "Sheet3!A1:I105";
-      const API_KEY = "AIzaSyBz5mnkgo89_e1cWlFK1AVNZ_1MCVVOFqA";
-      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+      const url = "https://insight-scope-pp2r.vercel.app/get-google-sheet-data";
 
       try {
         const response = await fetch(url, {
           method: "GET",
           headers: {
-            "Cache-Control": "no-store",
+            "If-None-Match": "ff5b95377b937c19476e3d2f2c426d97",
           },
         });
 
