@@ -13,9 +13,11 @@ import { LineChartComponent } from "./components/ui/LineChartComponent";
 import { filter } from "./utils/filter";
 import { Toaster } from "./components/ui/toaster";
 import { FadeLoader } from "react-spinners";
+import { useToast } from "./hooks/use-toast";
 
 const App = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [filteredData, setFilteredData] = useState(null);
   const [dataFromBe, setDataFromBe] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams({
@@ -121,6 +123,9 @@ const App = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data.message);
+        toast({
+          title: "Logged out successful!",
+        });
         localStorage.removeItem("authToken");
         navigate("/");
       })

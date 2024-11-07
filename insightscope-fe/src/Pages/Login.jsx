@@ -4,15 +4,14 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { useFetch } from "@/utils/useFetch";
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
-  const { toast } = useToast();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+  const { fetchLogin } = useFetch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,59 +21,18 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Simple validation
-    const newErrors = {};
-    if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
-
-    if (Object.keys(newErrors).length === 0) {
-      try {
-        const response = await fetch(
-          "https://insight-scope-pp2r.vercel.app/api/login",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-          }
-        );
-
-        const data = await response.json();
-
-        if (response.ok && data.accessToken) {
-          toast({
-            title: "Login successful!",
-          });
-          localStorage.setItem("authToken", data.accessToken);
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          setTimeout(() => {
-            navigate("/dashboard");
-          }, 1000);
-        } else {
-          setErrors({ general: "Invalid email or password" });
-
-          toast.error({ title: "Invalid email or password" });
-        }
-      } catch (error) {
-        console.error("Login error:", error);
-        setErrors({ general: "An error occurred during login" });
-
-        toast.error({ title: "An error occurred during login" });
-      }
-    } else {
-      setErrors(newErrors);
-    }
-  };
-
   const handleLoginAsGuest = () => {
     const guestCredentials = { email: "yash@gmail.com", password: "yash" };
     setFormData(guestCredentials);
-    handleSubmit({
-      preventDefault: () => {},
-    });
+
+    // Trigger validation for guest login credentials
+    fetchLogin(guestCredentials, setErrors);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Perform validation and login attempt
+    await fetchLogin(formData, setErrors);
   };
 
   return (
