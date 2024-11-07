@@ -32,6 +32,9 @@ ChartJS.register(
 );
 
 export function LineChartComponent({ data, category }) {
+  if (!data) {
+    return <div>Loading...</div>;
+  }
   const formattedData = data.map((entry) => {
     if (!entry?.Day) {
       console.warn("Invalid or missing 'day' field in entry:", entry);
@@ -51,7 +54,7 @@ export function LineChartComponent({ data, category }) {
     };
   });
 
-  const labels = formattedData.map((entry) => entry.Day);
+  const labels = formattedData.map((entry) => entry?.Day);
 
   const yAxisData = formattedData.map((entry) => entry[category]);
 

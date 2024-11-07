@@ -31,6 +31,7 @@ const App = () => {
   const [category, setCategory] = useState(searchParams.get("cat") || "A");
   const lineChartRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -138,13 +139,13 @@ const App = () => {
     <>
       <header className="flex items-center justify-between px-6 py-4 bg-teal-600 text-white shadow-md">
         <div>
-          <h1 className="text-lg font-semibold">Hello, Yashas!</h1>
+          <h1 className="text-lg font-semibold">Hello, {user?.fullname}!</h1>
           <p>Welcome to the InsightScope dashboard</p>
         </div>
 
         <button
           onClick={logoutHandle}
-          className="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-4 py-2 rounded-lg transition duration-200"
+          className="bg-teal-500 hover:bg-white hover:text-black text-white font-semibold px-4 py-2 rounded-lg transition duration-200"
         >
           Logout
         </button>
