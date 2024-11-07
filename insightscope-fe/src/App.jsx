@@ -41,7 +41,13 @@ const App = () => {
       const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
       try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Cache-Control": "no-store",
+          },
+        });
+
         const result = await response.json();
         if (result.values) {
           const headers = result.values[0];
@@ -62,6 +68,11 @@ const App = () => {
     };
 
     fetchData();
+
+    // Optional: Fetch data at intervals to keep it up-to-date
+    const intervalId = setInterval(fetchData, 5 * 60 * 1000); // Refresh every 5 minutes
+
+    return () => clearInterval(intervalId); // Cleanup on component unmount
   }, []);
 
   useEffect(() => {
