@@ -28,7 +28,12 @@ ChartJS.register(
   zoomPlugin
 );
 
-export function BarChartComponent({ data, setCategory, setSearchParams }) {
+export function BarChartComponent({
+  data,
+  setCategory,
+  setSearchParams,
+  lineChartRef,
+}) {
   const chartData = aggregateFeatureDataBar(data);
 
   if (!Array.isArray(chartData) || chartData.length === 0) {
@@ -44,7 +49,7 @@ export function BarChartComponent({ data, setCategory, setSearchParams }) {
       {
         label: "Values (Estimated in Minutes)",
         data: timeSpentData,
-        backgroundColor: "rgba(137, 134, 216, 0.6)",
+        backgroundColor: "#0D9488",
         borderColor: "rgba(137, 134, 216, 1)",
         borderWidth: 1,
       },
@@ -60,6 +65,13 @@ export function BarChartComponent({ data, setCategory, setSearchParams }) {
         prev.set("cat", clickedLabel);
         return prev;
       });
+
+      if (lineChartRef && lineChartRef.current) {
+        lineChartRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
@@ -11,6 +11,8 @@ import { AboutDashboard } from "@/components/ui/AboutDashboard";
 import { BarChartComponent } from "./components/ui/BarChartComponent";
 import { LineChartComponent } from "./components/ui/LineChartComponent";
 import { filter } from "./utils/filter";
+import { Toaster } from "./components/ui/toaster";
+import { FadeLoader } from "react-spinners";
 
 const App = () => {
   const navigate = useNavigate();
@@ -25,19 +27,37 @@ const App = () => {
   });
   const [date, setDate] = useState({});
   const [category, setCategory] = useState(searchParams.get("cat") || "A");
+  const lineChartRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      const SPREADSHEET_ID = "1l7GstWHc69HPV0irSdvoMIyHgtufUPKsbtCiNw7IKR0";
+      const RANGE = "Sheet3!A1:I105";
+      const API_KEY = "AIzaSyBz5mnkgo89_e1cWlFK1AVNZ_1MCVVOFqA";
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+
       try {
-        const response = await fetch(
-          "https://insight-scope-pp2r.vercel.app/api/data"
-        );
-        const json = await response.json();
-        setDataFromBe(json);
-      } catch (err) {
-        console.log(err);
+        const response = await fetch(url);
+        const result = await response.json();
+        if (result.values) {
+          const headers = result.values[0];
+          const rows = result.values.slice(1);
+          const formattedData = rows.map((row) => {
+            return row.reduce((acc, val, index) => {
+              acc[headers[index]] = val;
+              return acc;
+            }, {});
+          });
+          setDataFromBe(formattedData);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Error fetching data from Google Sheets:", error);
+        setLoading(false);
       }
     };
+
     fetchData();
   }, []);
 
@@ -77,10 +97,6 @@ const App = () => {
       return prev;
     });
   };
-
-  if (!dataFromBe) {
-    return <p>Loading data...</p>;
-  }
 
   const resetFilters = () => {
     const initialParams = new URLSearchParams({
@@ -123,110 +139,123 @@ const App = () => {
 
         <button
           onClick={logoutHandle}
-          className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg transition duration-200"
+          className="bg-teal-500 hover:bg-teal-600 text-white font-semibold px-4 py-2 rounded-lg transition duration-200"
         >
           Logout
         </button>
       </header>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center space-x-6 mb-10">
-          <Calendar
-            captionLayout="dropdown"
-            defaultMonth={new Date(2022, 9)}
-            mode="range"
-            selected={date}
-            onSelect={(range) => {
-              setDate(range);
-              if (range?.from && range?.to) {
-                setSearchParams(
-                  (prev) => {
-                    prev.set("startDate", range.from);
-                    prev.set("endDate", range.to);
-                    return prev;
-                  },
-                  { replace: true }
-                );
-              }
-            }}
-            className="rounded-md border border-gray-300 shadow-sm"
-          />
-        </div>
-
-        <div className="flex space-x-4 justify-center mb-6">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition">
-              Age{" "}
-              {searchParams.get("age") ? "is " + searchParams.get("age") : ""}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="rounded-md bg-white shadow-lg border border-gray-200">
-              <DropdownMenuItem
-                onClick={() => handleDropDownAge("15-25")}
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              >
-                15-25
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleDropDownAge(">25")}
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              >
-                &gt; 25
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition">
-              Gender{" "}
-              {searchParams.get("gender")
-                ? "is " + searchParams.get("gender")
-                : ""}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="rounded-md bg-white shadow-lg border border-gray-200">
-              <DropdownMenuItem
-                onClick={() => handleDropDownGender("Male")}
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              >
-                Male
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleDropDownGender("Female")}
-                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              >
-                Female
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <button
-            onClick={resetFilters}
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition"
-          >
-            Reset Filters
-          </button>
-        </div>
-
-        <div className="grid sm:grid-cols-2 gap-6 my-8">
-          {filteredData ? (
-            <>
-              <BarChartComponent
-                className="col-span-1"
-                data={filteredData}
-                setCategory={setCategory}
-                setSearchParams={setSearchParams}
+      {filteredData ? (
+        <div className="flex container mx-auto py-8 flex-col lg:flex-row">
+          {/* Sidebar (Filter Panel) */}
+          <div className="w-full lg:w-1/4 px-4 mb-8 lg:mb-0">
+            <div className="sticky top-0 space-y-6">
+              <Calendar
+                captionLayout="dropdown"
+                defaultMonth={new Date(2022, 9)}
+                mode="range"
+                selected={date}
+                onSelect={(range) => {
+                  setDate(range);
+                  if (range?.from && range?.to) {
+                    setSearchParams(
+                      (prev) => {
+                        prev.set("startDate", range.from);
+                        prev.set("endDate", range.to);
+                        return prev;
+                      },
+                      { replace: true }
+                    );
+                  }
+                }}
+                className="rounded-md border border-gray-300 shadow-sm"
               />
-              <LineChartComponent
-                className="col-span-1"
-                data={filteredData}
-                category={category}
-              />
-            </>
-          ) : (
-            <p className="text-center text-gray-500">Loading data...</p>
-          )}
-        </div>
 
-        <AboutDashboard />
-      </div>
+              <div className="space-y-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="w-full px-4 py-2 bg-teal-500 text-white font-semibold rounded-md hover:bg-teal-600 transition">
+                    Age{" "}
+                    {searchParams.get("age")
+                      ? "is " + searchParams.get("age")
+                      : ""}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="rounded-md bg-white shadow-lg border border-gray-200">
+                    <DropdownMenuItem
+                      onClick={() => handleDropDownAge("15-25")}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      15-25
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDropDownAge(">25")}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      &gt; 25
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="w-full px-4 py-2 bg-teal-500 text-white font-semibold rounded-md hover:bg-teal-600 transition">
+                    Gender{" "}
+                    {searchParams.get("gender")
+                      ? "is " + searchParams.get("gender")
+                      : ""}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="rounded-md bg-white shadow-lg border border-gray-200">
+                    <DropdownMenuItem
+                      onClick={() => handleDropDownGender("Male")}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Male
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleDropDownGender("Female")}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    >
+                      Female
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <button
+                  onClick={resetFilters}
+                  className="w-full px-4 py-2 bg-teal-500 text-white font-semibold rounded-md hover:bg-teal-600 transition"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-3/4 px-4 space-y-6">
+            <div className="grid gap-6 lg:grid-cols-1">
+              <>
+                <BarChartComponent
+                  className="col-span-1"
+                  data={filteredData}
+                  setCategory={setCategory}
+                  setSearchParams={setSearchParams}
+                  lineChartRef={lineChartRef}
+                />
+                <div ref={lineChartRef}>
+                  <LineChartComponent
+                    className="col-span-1"
+                    data={filteredData}
+                    category={category}
+                  />
+                </div>
+              </>
+            </div>
+
+            <AboutDashboard />
+          </div>
+        </div>
+      ) : (
+        <div className="flex bg-[#0D9488] text-white justify-center items-center h-screen">
+          <FadeLoader size="100" />
+        </div>
+      )}
+      <Toaster />
     </>
   );
 };

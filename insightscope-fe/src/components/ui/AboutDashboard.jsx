@@ -4,15 +4,17 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export function AboutDashboard() {
   return (
-    <Card className="w-full max-w-4xl mx-auto my-8">
-      <CardHeader>
+    <Card className="w-full max-w-6xl mx-auto my-8 bg-[#DBF2F2] shadow-lg rounded-lg">
+      <CardHeader className="bg-teal-500 text-white rounded-t-lg">
         <CardTitle>About This Dashboard</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6 p-6">
         {/* Bar Chart Section */}
         <div>
-          <h3 className="text-lg font-medium">Bar Chart Overview</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-xl font-semibold text-teal-600">
+            Bar Chart Overview
+          </h3>
+          <p className="text-sm text-gray-700">
             The Bar Chart offers a visual representation of how much time users
             spend on different product features. Each bar showcases a feature on
             the y-axis, with the length of the bar reflecting the total time
@@ -23,8 +25,10 @@ export function AboutDashboard() {
 
         {/* Line Chart Section */}
         <div>
-          <h3 className="text-lg font-medium">Line Chart Insights</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-xl font-semibold text-teal-600">
+            Line Chart Insights
+          </h3>
+          <p className="text-sm text-gray-700">
             Clicking on any bar from the Bar Chart reveals a detailed Line Chart
             for that feature. This chart tracks user engagement over time,
             giving you the ability to zoom and pan for deeper insights. By
@@ -35,8 +39,10 @@ export function AboutDashboard() {
 
         {/* Filters Section */}
         <div>
-          <h3 className="text-lg font-medium">Refine Your View with Filters</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-xl font-semibold text-teal-600">
+            Refine Your View with Filters
+          </h3>
+          <p className="text-sm text-gray-700">
             The dashboard includes filtering options, allowing you to customize
             the displayed data based on user demographics like age and gender.
             Additionally, you can narrow the date range to focus on a specific

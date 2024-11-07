@@ -33,12 +33,12 @@ ChartJS.register(
 
 export function LineChartComponent({ data, category }) {
   const formattedData = data.map((entry) => {
-    if (!entry?.day) {
+    if (!entry?.Day) {
       console.warn("Invalid or missing 'day' field in entry:", entry);
       return entry;
     }
 
-    const [day, month, year] = entry.day.split("/");
+    const [day, month, year] = entry.Day.split("/");
     const date = new Date(year, month - 1, day);
     const formattedDay = date.toLocaleDateString("en-GB", {
       day: "numeric",
@@ -51,7 +51,7 @@ export function LineChartComponent({ data, category }) {
     };
   });
 
-  const labels = formattedData.map((entry) => entry.day);
+  const labels = formattedData.map((entry) => entry.Day);
 
   const yAxisData = formattedData.map((entry) => entry[category]);
 

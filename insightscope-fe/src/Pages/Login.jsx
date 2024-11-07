@@ -4,10 +4,12 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -40,22 +42,39 @@ const LoginPage = () => {
         );
 
         const data = await response.json();
-        console.log(data);
 
         if (response.ok && data.accessToken) {
+          toast({
+            title: "Login successful!",
+          });
           localStorage.setItem("authToken", data.accessToken);
           localStorage.setItem("user", JSON.stringify(data.user));
-          navigate("/dashboard");
+
+          setTimeout(() => {
+            navigate("/dashboard");
+          }, 1000);
         } else {
           setErrors({ general: "Invalid email or password" });
+
+          toast.error({ title: "Invalid email or password" });
         }
       } catch (error) {
         console.error("Login error:", error);
         setErrors({ general: "An error occurred during login" });
+
+        toast.error({ title: "An error occurred during login" });
       }
     } else {
       setErrors(newErrors);
     }
+  };
+
+  const handleLoginAsGuest = () => {
+    const guestCredentials = { email: "yash@gmail.com", password: "yash" };
+    setFormData(guestCredentials);
+    handleSubmit({
+      preventDefault: () => {},
+    });
   };
 
   return (
@@ -118,6 +137,15 @@ const LoginPage = () => {
             Login
           </button>
         </CardFooter>
+        <div className="w-3/4 mx-auto">
+          <button
+            type="button"
+            className="w-full bg-gray-600 text-white p-3 rounded-md hover:bg-gray-700 focus:outline-none"
+            onClick={handleLoginAsGuest}
+          >
+            Login as Guest
+          </button>
+        </div>
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}

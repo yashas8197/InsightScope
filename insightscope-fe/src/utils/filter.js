@@ -3,7 +3,7 @@ export const filter = (data, date, age, gender) => {
 
   if (date.startDate !== undefined && date.endDate !== undefined) {
     newData = newData.filter((item) => {
-      const itemDateParts = item.day.split("/");
+      const itemDateParts = item.Day.split("/");
       const itemDate = new Date(
         itemDateParts[2],
         itemDateParts[1] - 1,
@@ -14,11 +14,11 @@ export const filter = (data, date, age, gender) => {
   }
 
   if (age) {
-    newData = newData.filter((item) => item.age === age);
+    newData = newData.filter((item) => item.Age === age);
   }
 
   if (gender) {
-    newData = newData.filter((item) => item.gender === gender);
+    newData = newData.filter((item) => item.Gender === gender);
   }
 
   return newData;
