@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const { mongoose } = require("mongoose");
 
 const dataSchema = new mongoose.Schema({
   day: {
@@ -41,4 +41,4 @@ const dataSchema = new mongoose.Schema({
 
 const Data = new mongoose.model("Data", dataSchema);
 
-module.exports = Data;
+export default Data;

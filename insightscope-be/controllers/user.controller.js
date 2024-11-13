@@ -1,4 +1,4 @@
-const { User } = require("../models/user.model");
+const User = require("../models/user.model.js");
 const jwt = require("jsonwebtoken");
 
 const genreateAccessOrRefreshToken = async (userId) => {
@@ -37,8 +37,6 @@ const userSignUp = async (req, res) => {
       email,
       password,
     });
-
-    console.log(user);
 
     const createdUser = await User.findById(user._id).select(
       "-password -refreshToken"
@@ -185,4 +183,4 @@ const refreshAccessToken = async (req, res) => {
   }
 };
 
-module.exports = { userSignUp, loginUser, logoutUser, refreshAccessToken };
+module.exports = { refreshAccessToken, logoutUser, loginUser, userSignUp };
