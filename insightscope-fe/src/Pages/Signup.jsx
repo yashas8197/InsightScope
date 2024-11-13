@@ -4,10 +4,12 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const SignUp = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
@@ -31,7 +33,6 @@ const SignUp = () => {
     if (!formData.fullname) newErrors.fullname = "fullname is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
-    console.log(formData);
 
     if (Object.keys(newErrors).length === 0) {
       try {
@@ -49,6 +50,9 @@ const SignUp = () => {
         const data = await response.json();
 
         if (data.token) {
+          toast({
+            title: "Logged successful!",
+          });
           localStorage.setItem("authToken", data.token);
 
           navigate("/dashboard");
