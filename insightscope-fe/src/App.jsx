@@ -14,6 +14,7 @@ import { filter } from "./utils/filter";
 import { Toaster } from "./components/ui/toaster";
 import { FadeLoader } from "react-spinners";
 import { useToast } from "./hooks/use-toast";
+import { BASE_URL } from "./utils/constant";
 
 const App = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const App = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const url = "https://insight-scope-pp2r.vercel.app/get-google-sheet-data";
+      const url = `${BASE_URL}/get-google-sheet-data`;
 
       try {
         const response = await fetch(url, {
@@ -123,7 +124,7 @@ const App = () => {
   };
 
   const logoutHandle = () => {
-    fetch("https://insight-scope-pp2r.vercel.app/api/logout", {
+    fetch(`${BASE_URL}/api/logout`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("authToken")}`,

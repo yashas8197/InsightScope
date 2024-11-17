@@ -5,6 +5,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { BASE_URL } from "@/utils/constant";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -36,16 +37,13 @@ const SignUp = () => {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        const response = await fetch(
-          "https://insight-scope-pp2r.vercel.app/api/signup",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          }
-        );
+        const response = await fetch(`${BASE_URL}/api/signup`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
 
         const data = await response.json();
 

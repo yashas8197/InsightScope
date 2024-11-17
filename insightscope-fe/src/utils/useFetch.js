@@ -1,5 +1,6 @@
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router";
+import { BASE_URL } from "./constant";
 
 export const useFetch = () => {
   const { toast } = useToast();
@@ -14,14 +15,11 @@ export const useFetch = () => {
 
     if (Object.keys(newErrors).length === 0) {
       try {
-        const response = await fetch(
-          "https://insight-scope-pp2r.vercel.app/api/login",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-          }
-        );
+        const response = await fetch(`${BASE_URL}/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        });
 
         const data = await response.json();
 
