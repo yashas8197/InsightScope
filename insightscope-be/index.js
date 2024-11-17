@@ -17,13 +17,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
-const corsOptions = {
-  origin: "*",
-  credentials: true,
-  optionSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 initializeDatabase();
 
 app.post("/api/signup", userSignUp);

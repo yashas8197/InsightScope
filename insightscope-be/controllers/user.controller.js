@@ -1,7 +1,7 @@
 const User = require("../models/user.model.js");
 const jwt = require("jsonwebtoken");
 
-const genreateAccessOrRefreshToken = async (userId) => {
+const generateAccessOrRefreshToken = async (userId) => {
   try {
     const user = await User.findById(userId);
     const accessToken = user.generateAccessToken();
@@ -12,9 +12,7 @@ const genreateAccessOrRefreshToken = async (userId) => {
 
     return { accessToken, refreshToken };
   } catch (error) {
-    return res.status(500).json({
-      error: "Something went wrong genreating refresh and access token",
-    });
+    throw error;
   }
 };
 
@@ -81,7 +79,7 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid password" });
     }
 
-    const { accessToken, refreshToken } = await genreateAccessOrRefreshToken(
+    const { accessToken, refreshToken } = await generateAccessOrRefreshToken(
       user._id
     );
 
@@ -134,7 +132,10 @@ const logoutUser = async (req, res) => {
       .clearCookie("accessToken", options)
       .clearCookie("refreshToken", options)
       .json({ message: "User Logged out" });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const refreshAccessToken = async (req, res) => {
