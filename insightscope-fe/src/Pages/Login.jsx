@@ -8,7 +8,7 @@ import { useFetch } from "@/utils/useFetch";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const LoginPage = () => {
+const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const { fetchLogin } = useFetch();
@@ -120,4 +120,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default Login;
